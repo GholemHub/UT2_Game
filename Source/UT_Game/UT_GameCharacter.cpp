@@ -360,9 +360,12 @@ void AUT_GameCharacter::PossessedBy(AController* NewController)
 	}
 }
 
+
+
 void AUT_GameCharacter::Die()
 {
 	UTPlayerState = EUTPlayerState::Death;
+
 	AController* PlayerController = GetController();
 	DropItem();
 
@@ -371,9 +374,6 @@ void AUT_GameCharacter::Die()
 	DetachFromControllerPendingDestroy();
 
 	Multicast_Ragdoll();
-
-	//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("Character Died"));
-
 
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
@@ -404,7 +404,8 @@ void AUT_GameCharacter::Die()
 				}
 			}), 5.0f, false);
 	}
-	
+	if (!GetWorld()) return;
+	OnAIStateChangedWithParam.Broadcast(UTPlayerState);
 }
 
 void AUT_GameCharacter::Multicast_Ragdoll_Implementation()

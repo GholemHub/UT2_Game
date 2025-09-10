@@ -25,6 +25,7 @@ struct FInputActionValue;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnFirePressed);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnFireReleased);
 
+
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
 UENUM(BlueprintType)
@@ -36,14 +37,19 @@ enum class EUTPlayerState : uint8
 
 };
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAIStateChangedWithParam, EUTPlayerState, NewState);
+
+
 UCLASS(config=Game)
 class AUT_GameCharacter : public ACharacter, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 public:
 
+	UPROPERTY(BlueprintAssignable, Category = "AI")
+	FOnAIStateChangedWithParam OnAIStateChangedWithParam;
 
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = State)
 	EUTPlayerState UTPlayerState = EUTPlayerState::NON;
 
 	UFUNCTION()
