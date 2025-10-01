@@ -67,9 +67,14 @@ protected:
 	void ApplyRadialImpulse();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sound)
-	USoundBase* AttackSound;
+	USoundBase* AttackSound;	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int TypeOfAttack = 0;
+
 
 private:
+
+
 	UFUNCTION(BlueprintCallable)
 	void MakeHitAnimation();
 

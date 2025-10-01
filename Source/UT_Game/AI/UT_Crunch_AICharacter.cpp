@@ -81,9 +81,15 @@ void AUT_Crunch_AICharacter::MakeHit()
 
 void AUT_Crunch_AICharacter::ApplyRadialImpulse()
 {
-	//if (bIsAttacking == true && bCanAtack == true) {
-	
-		const FName BoneName = TEXT("hand_r");
+	FName BoneName;
+
+		TypeOfAttack = FMath::RandBool();
+		if (TypeOfAttack == 0) {
+			BoneName = TEXT("hand_r");
+		}
+		else {
+			BoneName = TEXT("hand_l");
+		}
 		FVector HandLocation = Mesh1P->GetBoneLocation(BoneName);
 
 		float Radius = 300.f;
@@ -116,7 +122,7 @@ void AUT_Crunch_AICharacter::ApplyRadialImpulse()
 				
 						OtherChar->LaunchCharacter(Impulse, true, true);
 
-						float Damage = 30.f;
+						float Damage = 0.f;
 						UGameplayStatics::ApplyDamage(
 							OtherChar,
 							Damage,

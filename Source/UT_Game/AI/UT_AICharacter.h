@@ -15,7 +15,7 @@ class UT_GAME_API AUT_AICharacter : public AUT_GameCharacter
 {
 	GENERATED_BODY()
 public:
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = State)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated,  Category = State)
     int AIState = 2;
 	AUT_AICharacter(const FObjectInitializer& ObjInit);
     AUT_AICharacter() { }
@@ -31,6 +31,9 @@ public:
         }
         return FGenericTeamId(0); // default
     }
+
+    virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
 	class UBehaviorTree* BechaviorTreeAsset;
