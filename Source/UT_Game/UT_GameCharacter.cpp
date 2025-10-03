@@ -20,9 +20,8 @@
 #include "PlayerWidget.h"
 #include "UT_HUD.h"
 #include "Weapon/AI_UT_MurdockWeapon.h"
+#include "Perception/AISense_Hearing.h"
 #include "Inventory/UT_Picked_Item_Component.h"
-
-
 
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -43,6 +42,13 @@ void AUT_GameCharacter::Respawn()
 		GM->RestartPlayer(GetController());
 		UTPlayerState = EUTPlayerState::Alive;
 	}
+}
+
+void AUT_GameCharacter::UpdateUIDamage(AActor* Actor, float DamageAmount)
+{
+	UE_LOG(LogTemp, Warning, TEXT("UpdateUIDamage"));
+
+
 }
 
 AUT_GameCharacter::AUT_GameCharacter()
@@ -116,6 +122,14 @@ void AUT_GameCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	}
 }
 
+void AUT_GameCharacter::UpdateDamageFunctionTemp(float DamageAmmount)
+{
+	DamageUI = DamageAmmount;
+	//UE_LOG(LogTemp, Warning, TEXT("UpdateUIDamage "));
+	OnDamageAplyed.Broadcast(this, DamageAmmount);
+
+}
+
 void AUT_GameCharacter::EndCrouch()
 {
 	UnCrouch();
@@ -161,9 +175,10 @@ void AUT_GameCharacter::BeginPlay()
 	Super::BeginPlay();
 	UTPlayerState = EUTPlayerState::Alive;
 	if (!WeaponComponent) return;
+	
+	OnDamageAplyed.AddDynamic(this, &AUT_GameCharacter::UpdateUIDamage);
 }
 
-#include "Perception/AISense_Hearing.h"
 
 
 void AUT_GameCharacter::Tick(float DeltaTime)
@@ -331,9 +346,18 @@ float AUT_GameCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Dama
 	{
 		return 0.0f;
 	}
-
 	float DamageApplied = FMath::Min(Health, DamageAmount);
 	Health -= DamageApplied;
+	OnDamageAplyed.Broadcast(this, DamageApplied);
+
+	auto Shooter = Cast<AUT_GameCharacter>(DamageCauser->GetOwner());
+		if (Shooter)
+		{
+			Shooter->UpdateDamageFunctionTemp(DamageApplied);
+		}
+
+	UE_LOG(LogTemp, Warning, TEXT("!!!!!!!!!! Damage done %s :: %f"), *DamageCauser->GetOwner()->GetName(), DamageApplied);
+
 
 	//PlayerWidgetInstance->SetHealthText(Health);
 	if (Health <= 0.0f)

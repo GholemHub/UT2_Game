@@ -60,6 +60,7 @@ void AUT_Flak_Projectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor
                 this, InstigatorController, true
             );
 
+
            /* DrawDebugSphere(
                 GetWorld(), Hit.ImpactPoint, 200.0f, 12,
                 FColor::Red, false, 2.0f, 0, 1.5f

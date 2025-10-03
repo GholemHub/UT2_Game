@@ -25,6 +25,11 @@ struct FInputActionValue;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnFirePressed);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnFireReleased);
 
+//DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDamageAplyed);
+
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnDamageAplyed, AActor*, DamagedActor, float, DamageAmount);
+
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
@@ -36,7 +41,6 @@ enum class EUTPlayerState : uint8
 	NON			UMETA(DisplayName = "NON"),
 
 };
-
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAIStateChangedWithParam, EUTPlayerState, NewState);
 
 
@@ -109,6 +113,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
 	FOnFireReleased OnFireReleased;
 
+	UPROPERTY(BlueprintAssignable, Category = "Damage")
+	FOnDamageAplyed OnDamageAplyed;
+	
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
 	UInputAction* DropItemAction;
@@ -142,6 +150,11 @@ protected:
 
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Damage)
+	float DamageUI;
+	UFUNCTION(BlueprintCallable)
+
+	void UpdateDamageFunctionTemp(float DamageAmmount);
 
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	bool bEquipped = false;
@@ -152,6 +165,8 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	UFUNCTION()
+	void UpdateUIDamage(AActor* Actor, float DamageAmount);
 
 	UFUNCTION()
 	void HandleFirePressed();

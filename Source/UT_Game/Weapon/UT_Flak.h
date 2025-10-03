@@ -18,7 +18,7 @@ class UT_GAME_API AUT_Flak : public AActor
 public:
 	// Sets default values for this actor's properties
 	AUT_Flak();
-
+	
 protected:
 	// Lifecycle
 	virtual void BeginPlay() override;
@@ -39,6 +39,12 @@ public:
 
 	UFUNCTION()
 	void OnRep_ReplicatedMesh();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+	UTexture2D* WeaponIcon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+	FString WeaponName = "FLACK";
 
 	/** Projectile class to spawn */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Projectile")
