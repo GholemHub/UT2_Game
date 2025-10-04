@@ -46,7 +46,6 @@ void AUT_GameCharacter::Respawn()
 
 void AUT_GameCharacter::UpdateUIDamage(AActor* Actor, float DamageAmount)
 {
-	if (!IsLocallyControlled()) return; // local only
 	UE_LOG(LogTemp, Warning, TEXT("UpdateUIDamage"));
 }
 
@@ -358,15 +357,12 @@ float AUT_GameCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Dama
 
 	DamageApplied = (float)FMath::RoundToInt(DamageApplied);
 
-	//OnDamageAplyed.Broadcast(this, DamageApplied);
+	OnDamageAplyed.Broadcast(this, DamageApplied);
 
 	auto Shooter = Cast<AUT_GameCharacter>(DamageCauser->GetOwner());
 	if (Shooter && Shooter->IsPlayerControlled())
 	{
-		if (HasAuthority()) // server only
-		{
-			Shooter->Client_UpdateDamageUI(DamageApplied);
-		}
+		Shooter->Client_UpdateDamageUI(DamageApplied);
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("!!!!!!!!!! Damage done %s :: %f"), *DamageCauser->GetOwner()->GetName(), DamageApplied);

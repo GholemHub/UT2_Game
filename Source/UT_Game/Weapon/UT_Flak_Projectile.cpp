@@ -54,8 +54,9 @@ void AUT_Flak_Projectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor
     if (OtherActor && OtherActor != this && OtherComp)
     {
         if (WeaponIsRadial) {
+            float RandomValue = FMath::FRandRange(Damage - 5.0f, Damage + 5.0f);
             UGameplayStatics::ApplyRadialDamage(
-                this, Damage, Hit.ImpactPoint, 200.f,
+                this, RandomValue, Hit.ImpactPoint, 200.f,
                 UDamageType::StaticClass(), TArray<AActor*>(),
                 this, InstigatorController, true
             );
@@ -67,8 +68,9 @@ void AUT_Flak_Projectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor
             );*/
         }
         else {
+            float RandomValue = FMath::FRandRange(Damage - 2.0f, Damage + 2.0f);
             UGameplayStatics::ApplyDamage(
-                OtherActor, Damage, InstigatorController,
+                OtherActor, RandomValue, InstigatorController,
                 this, UDamageType::StaticClass()
             );
         }

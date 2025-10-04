@@ -50,6 +50,10 @@ class AUT_GameCharacter : public ACharacter, public IGenericTeamAgentInterface
 	GENERATED_BODY()
 public:
 
+
+	UFUNCTION(Client, Reliable)
+	void Client_UpdateDamageUI(float DamageAmount);
+
 	UPROPERTY(BlueprintAssignable, Category = "AI")
 	FOnAIStateChangedWithParam OnAIStateChangedWithParam;
 
@@ -116,8 +120,6 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Damage")
 	FOnDamageAplyed OnDamageAplyed;
 	
-
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
 	UInputAction* DropItemAction;
 
