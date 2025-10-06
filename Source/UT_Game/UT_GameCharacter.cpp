@@ -173,7 +173,7 @@ void AUT_GameCharacter::BeginPlay()
 
 	Super::BeginPlay();
 	UTPlayerState = EUTPlayerState::Alive;
-	if (!WeaponComponent) return;
+	//if (!WeaponComponent) return;
 	
 	OnDamageAplyed.AddDynamic(this, &AUT_GameCharacter::UpdateUIDamage);
 }

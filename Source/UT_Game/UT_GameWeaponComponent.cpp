@@ -13,6 +13,11 @@
 #include "Engine/LocalPlayer.h"
 #include "Engine/World.h"
 
+void UUT_GameWeaponComponent::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
 // Sets default values for this component's properties
 UUT_GameWeaponComponent::UUT_GameWeaponComponent()
 {

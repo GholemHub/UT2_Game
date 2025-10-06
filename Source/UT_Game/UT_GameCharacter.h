@@ -152,6 +152,10 @@ protected:
 
 
 public:
+
+	UPROPERTY()
+	UMaterialInstanceDynamic* DynMaterial;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Damage)
 	float DamageUI;
 	UFUNCTION(BlueprintCallable)
@@ -243,6 +247,8 @@ protected:
 
 	UFUNCTION()
 	AActor* CalculateTraceDirection();
+
+	
 
 	
 };

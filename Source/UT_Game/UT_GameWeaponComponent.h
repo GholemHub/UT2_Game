@@ -14,6 +14,9 @@ class UT_GAME_API UUT_GameWeaponComponent : public USkeletalMeshComponent
 	GENERATED_BODY()
 
 public:
+
+	virtual void BeginPlay() override;
+
 	/** Projectile class to spawn */
 	UPROPERTY(EditDefaultsOnly, Category=Projectile)
 	TSubclassOf<class AUT_GameProjectile> ProjectileClass;

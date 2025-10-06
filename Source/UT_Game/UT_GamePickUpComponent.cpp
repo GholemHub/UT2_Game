@@ -11,7 +11,7 @@ UUT_GamePickUpComponent::UUT_GamePickUpComponent()
 void UUT_GamePickUpComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
+	if (!GetWorld() || !GetOwner()) return;
 	// Register our Overlap Event
 	OnComponentBeginOverlap.AddDynamic(this, &UUT_GamePickUpComponent::OnSphereBeginOverlap);
 }

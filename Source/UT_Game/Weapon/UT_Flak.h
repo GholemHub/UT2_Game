@@ -106,7 +106,7 @@ protected:
 	bool bHasAmmo = true;
 
 	/** Timer handle for controlling fire rate */
-	UPROPERTY(ReplicatedUsing = On_FireRateHandle)
+	//UPROPERTY(ReplicatedUsing = On_FireRateHandle)
 	FTimerHandle FireRateHandle;
 
 	/** Triggered when bCanFire is updated */

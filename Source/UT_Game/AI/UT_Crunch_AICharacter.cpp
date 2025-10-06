@@ -57,7 +57,6 @@ void AUT_Crunch_AICharacter::OnSphereEndOverlap(
 
 void AUT_Crunch_AICharacter::BeginPlay()
 {
-
 	Super::BeginPlay();
 }
 

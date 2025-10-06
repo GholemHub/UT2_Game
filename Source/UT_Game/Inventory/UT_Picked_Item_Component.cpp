@@ -5,6 +5,7 @@
 #include "../Weapon/UT_Flak.h"
 #include "Blueprint/UserWidget.h"
 #include "../UT_GameCharacter.h"
+#include "../Weapon/AmmoClass.h"
 
 // Sets default values for this component's properties
 UUT_Picked_Item_Component::UUT_Picked_Item_Component()
@@ -19,6 +20,7 @@ UUT_Picked_Item_Component::UUT_Picked_Item_Component()
 // Called when the game starts
 void UUT_Picked_Item_Component::BeginPlay()
 { 
+	Super::BeginPlay();
 	Owner = GetOwner();
 }
 
@@ -27,11 +29,9 @@ void UUT_Picked_Item_Component::BeginPlay()
 void UUT_Picked_Item_Component::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
 }
 
-#include "../Weapon/AmmoClass.h"
+
 
 
 void UUT_Picked_Item_Component::ChangeItemState(EItemState NewState, AActor* Player)

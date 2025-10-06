@@ -19,8 +19,6 @@ void AUT_AICharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 
 void AUT_AICharacter::BeginPlay()
 {
-
-
 	Super::BeginPlay();
 
 }
