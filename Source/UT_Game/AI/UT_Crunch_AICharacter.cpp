@@ -19,6 +19,8 @@ AUT_Crunch_AICharacter::AUT_Crunch_AICharacter()
 	DanageZoneComponentSphere->OnComponentBeginOverlap.AddDynamic(this, &AUT_Crunch_AICharacter::OnSphereBeginOverlap);
 	DanageZoneComponentSphere->OnComponentEndOverlap.AddDynamic(this, &AUT_Crunch_AICharacter::OnSphereEndOverlap);
 
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
 }
 
 

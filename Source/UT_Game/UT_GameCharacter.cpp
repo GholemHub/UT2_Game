@@ -28,22 +28,21 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 // AUT_GameCharacter
 
-void AUT_GameCharacter::Respawn()
-{
+
+
+void AUT_GameCharacter::Respawn() 
+{ 
 	auto DeadCharacter = this;
-	if (IsValid(DeadCharacter))
-	{
+	if (IsValid(DeadCharacter)) 
+	{ 
 		DeadCharacter->WeaponComponent->DestroyTheWeapon();
-		DeadCharacter->Destroy();
-	}
-
-	if (AGameModeBase* GM = UGameplayStatics::GetGameMode(GetController()))
-	{
-		GM->RestartPlayer(GetController());
-		UTPlayerState = EUTPlayerState::Alive;
-	}
+		DeadCharacter->Destroy(); 
+	} 
+	if (AGameModeBase* GM = UGameplayStatics::GetGameMode(GetController())) 
+	{ 
+			GM->RestartPlayer(GetController()); UTPlayerState = EUTPlayerState::Alive; 
+	} 
 }
-
 void AUT_GameCharacter::UpdateUIDamage(AActor* Actor, float DamageAmount)
 {
 	if (!IsLocallyControlled()) return; // local only
@@ -167,6 +166,27 @@ void AUT_GameCharacter::Look(const FInputActionValue& Value)
 		AddControllerPitchInput(LookAxisVector.Y * Sensitivity * GetWorld()->GetDeltaSeconds());
 	}
 }
+#include "GameFramework/PlayerState.h"
+
+void AUT_GameCharacter::AssignPlayerNumber()
+{
+	int32 PlayerNumber = -1;
+
+	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	{
+		if (PC->IsLocalController() && PC->GetLocalPlayer())
+		{
+			PlayerNumber = PC->GetLocalPlayer()->GetControllerId();
+		}
+		else if (APlayerState* PS = GetPlayerState())
+		{
+			PlayerNumber = PS->GetPlayerId();
+		}
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Final Player Number (Delayed): %d"), PlayerNumber);
+
+}
 
 void AUT_GameCharacter::BeginPlay()
 {
@@ -174,7 +194,8 @@ void AUT_GameCharacter::BeginPlay()
 	Super::BeginPlay();
 	UTPlayerState = EUTPlayerState::Alive;
 	//if (!WeaponComponent) return;
-	
+	//GetWorldTimerManager().SetTimerForNextTick(this, &AUT_GameCharacter::AssignPlayerNumber);
+
 	OnDamageAplyed.AddDynamic(this, &AUT_GameCharacter::UpdateUIDamage);
 }
 
@@ -346,12 +367,15 @@ void AUT_GameCharacter::Client_UpdateDamageUI_Implementation(float DamageAmount)
 	UpdateDamageFunctionTemp(DamageAmount); // This triggers UI on owning client
 }
 
+
+
 float AUT_GameCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	if (Health <= 0.0f)
 	{
-		return 0.0f;
+		Die();
 	}
+	
 	float DamageApplied = FMath::Min(Health, DamageAmount);
 
 	Health -= DamageApplied;
@@ -373,13 +397,13 @@ float AUT_GameCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Dama
 
 
 	//PlayerWidgetInstance->SetHealthText(Health);
+	
+
+// How to add here the widget
 	if (Health <= 0.0f)
 	{
 		Die();
 	}
-
-// How to add here the widget
-
 	
 	return DamageApplied;
 }
@@ -387,6 +411,8 @@ float AUT_GameCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Dama
 void AUT_GameCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
+
+	AssignPlayerNumber();
 
 	if (HasAuthority())
 	{
@@ -398,51 +424,63 @@ void AUT_GameCharacter::PossessedBy(AController* NewController)
 }
 
 
-
 void AUT_GameCharacter::Die()
 {
 	UTPlayerState = EUTPlayerState::Death;
+	if (!IsValid(GetWorld())) return;
+
+	OnAIStateChangedWithParam.Broadcast(UTPlayerState);
 
 	AController* PlayerController = GetController();
 	DropItem();
 
-	// Disable input/movement
 	GetCharacterMovement()->DisableMovement();
 	DetachFromControllerPendingDestroy();
 
 	Multicast_Ragdoll();
-
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	
-	if (HasAuthority() && PlayerController)
+
+	if (HasAuthority() && IsValid(PlayerController))
 	{
 		FTimerHandle RespawnTimer;
-		
+		TWeakObjectPtr<AUT_GameCharacter> SafeThis(this);
+		TWeakObjectPtr<AController> SafePC(PlayerController);
+
+		// Respawn after 5s
 		GetWorld()->GetTimerManager().SetTimer(
 			RespawnTimer,
-			this,
-			&AUT_GameCharacter::Respawn,
-			5.0f,   // delay in seconds
-			false   // false = run once, true = loop
-		);
-
-		GetWorldTimerManager().SetTimer(RespawnTimer, FTimerDelegate::CreateLambda([PlayerController, DeadCharacter = this]()
+			[SafeThis, SafePC]()
 			{
-				// Destroy old actor before respawning
-				if (IsValid(DeadCharacter))
+				if (!SafeThis.IsValid() || !SafePC.IsValid()) return;
+
+				// Clean up weapon
+				if (SafeThis->WeaponComponent)
 				{
-					DeadCharacter->WeaponComponent->DestroyTheWeapon();
-					DeadCharacter->Destroy();  
+					SafeThis->WeaponComponent->DestroyTheWeapon();
 				}
 
-				if (AGameModeBase* GM = UGameplayStatics::GetGameMode(PlayerController))
+				// Start fade-out (optional)
+				if (USkeletalMeshComponent* Mesh = SafeThis->GetMesh())
 				{
-					GM->RestartPlayer(PlayerController);
+					Mesh->SetSimulatePhysics(false);
+					Mesh->SetVisibility(false, true);
 				}
-			}), 5.0f, false);
+
+				// Now actually destroy
+				if (UWorld* World = SafePC->GetWorld())
+				{
+					if (AGameModeBase* GM = UGameplayStatics::GetGameMode(World))
+					{
+						GM->RestartPlayer(SafePC.Get());
+					}
+				}
+
+				SafeThis->Destroy();
+			},
+			5.0f,
+			false
+		);
 	}
-	if (!GetWorld()) return;
-	OnAIStateChangedWithParam.Broadcast(UTPlayerState);
 }
 
 void AUT_GameCharacter::Multicast_Ragdoll_Implementation()

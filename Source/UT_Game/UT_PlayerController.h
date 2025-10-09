@@ -19,5 +19,5 @@ class UT_GAME_API AUT_PlayerController : public APlayerController
 {
 	GENERATED_BODY()
 protected:
-
+	//virtual void OnPossess(APawn* InPawn);
 };

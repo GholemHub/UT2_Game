@@ -43,6 +43,12 @@ void AUT_Flak::OnRep_ReplicatedMesh()
 {
 }
 
+void AUT_Flak::OnRep_Ammo()
+{
+	OnAmmoChanged.Broadcast(Ammo);
+	UE_LOG(LogTemp, Warning, TEXT("[Client] Ammo replicated: %d"), Ammo);
+}
+
 void AUT_Flak::CanFire()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Ammo::: %i"), Ammo);
@@ -60,18 +66,22 @@ void AUT_Flak::CanFire()
 
 void AUT_Flak::ServerFire_Implementation(FVector_NetQuantizeNormal ShootDirection, FVector_NetQuantize FireOrigin)
 {
+	CanFire();
+
+	if (!bHasAmmo) return;
+	Ammo--;
+
+	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green,
+		FString::Printf(TEXT("Current Ammo: %i"), Ammo));
+	OnAmmoChanged.Broadcast(Ammo); // Immediate local update (server)
 
 	Multicast_ActuallyFire(ShootDirection, FireOrigin);
 }
 
 void AUT_Flak::Multicast_ActuallyFire(FVector_NetQuantizeNormal ShootDirection, FVector_NetQuantize FireOrigin)
 {
-	CanFire();
-	
-	if (!bHasAmmo) return;
-	Ammo--;
 	bCanFire = false;
-
+	
 	UE_LOG(LogTemp, Warning, TEXT("Looking for some fire 11"));
 	if (!Projectile || !GetWorld()) return;
 
@@ -232,6 +242,8 @@ void AUT_Flak::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetime
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AUT_Flak, bCanFire);
+	DOREPLIFETIME(AUT_Flak, Ammo);
+
 }
 
 void AUT_Flak::On_bCanFire()

@@ -54,7 +54,9 @@ void AMurdockAIController::OnPossess(APawn* InPawn)
         {
             if (UTCharacter)
             {
-                RunBehaviorTree(UTCharacter->BechaviorTreeAsset);
+                if (UTCharacter->BechaviorTreeAsset) {
+                    RunBehaviorTree(UTCharacter->BechaviorTreeAsset);
+                }
             }
         },
         4.0f,

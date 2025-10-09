@@ -217,7 +217,7 @@ protected:
 	void Server_PickUpItem(AActor* TargetItem);
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_PickUpItem(AActor* TargetItem);
-
+	void AssignPlayerNumber();
 
 
 	UPROPERTY(Replicated)

@@ -10,6 +10,9 @@
 class AUT_GameCharacter;
 class UNiagaraSystem;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAmmoChanged, int, NewAmmo);
+
+
 UCLASS()
 class UT_GAME_API AUT_Flak : public AActor
 {
@@ -25,6 +28,8 @@ protected:
 
 public:
 
+	UPROPERTY(BlueprintAssignable, Category = "Weapon|Events")
+	FAmmoChanged OnAmmoChanged;
 
 	/** Static mesh for the weapon */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
@@ -44,13 +49,19 @@ public:
 	UTexture2D* WeaponIcon;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+	UTexture2D* WeaponEmptyIcon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	FString WeaponName = "FLACK";
 
 	/** Projectile class to spawn */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Projectile")
 	TSubclassOf<AUT_Flak_Projectile> Projectile;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Projectile")
+	UFUNCTION()
+	void OnRep_Ammo();
+
+	UPROPERTY(ReplicatedUsing = OnRep_Ammo, BlueprintReadWrite)
 	int Ammo = 10;
 	UFUNCTION()
 	void CanFire();
