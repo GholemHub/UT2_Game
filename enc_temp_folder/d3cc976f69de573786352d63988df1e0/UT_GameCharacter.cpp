@@ -383,7 +383,7 @@ float AUT_GameCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Dama
 	DamageApplied = (float)FMath::RoundToInt(DamageApplied);
 
 	//OnDamageAplyed.Broadcast(this, DamageApplied);
-	if (UTPlayerState == EUTPlayerState::Death) return 0.0f;
+
 	auto Shooter = Cast<AUT_GameCharacter>(DamageCauser->GetOwner());
 	if (Shooter && Shooter->IsPlayerControlled())
 	{

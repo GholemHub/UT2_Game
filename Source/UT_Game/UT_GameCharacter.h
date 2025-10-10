@@ -57,7 +57,7 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "AI")
 	FOnAIStateChangedWithParam OnAIStateChangedWithParam;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = State)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category = State)
 	EUTPlayerState UTPlayerState = EUTPlayerState::NON;
 
 	UFUNCTION()
