@@ -71,8 +71,8 @@ void AUT_Flak::ServerFire_Implementation(FVector_NetQuantizeNormal ShootDirectio
 	if (!bHasAmmo) return;
 	Ammo--;
 
-	/*GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green,
-		FString::Printf(TEXT("Current Ammo: %i"), Ammo));*/
+	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green,
+		FString::Printf(TEXT("Current Ammo: %i"), Ammo));
 	OnAmmoChanged.Broadcast(Ammo); // Immediate local update (server)
 
 	Multicast_ActuallyFire(ShootDirection, FireOrigin);
