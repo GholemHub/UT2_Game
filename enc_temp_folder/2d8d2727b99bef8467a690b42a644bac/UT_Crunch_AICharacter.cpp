@@ -125,7 +125,7 @@ void AUT_Crunch_AICharacter::ApplyRadialImpulse()
 
 						UGameplayStatics::ApplyDamage(
 							OtherChar,
-							RandomValue,
+							Damage,
 							GetController(),
 							this,
 							UDamageType::StaticClass()

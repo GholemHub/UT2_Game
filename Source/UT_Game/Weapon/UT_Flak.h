@@ -61,7 +61,7 @@ public:
 	UFUNCTION()
 	void OnRep_Ammo();
 
-	UPROPERTY(ReplicatedUsing = OnRep_Ammo, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, ReplicatedUsing = OnRep_Ammo, BlueprintReadWrite)
 	int Ammo = 10;
 	UFUNCTION()
 	void CanFire();

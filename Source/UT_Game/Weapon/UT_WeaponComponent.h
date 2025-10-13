@@ -43,8 +43,6 @@ public:
 	UFUNCTION()
 	void HandleFirePressed();
 
-
-
 	/** Called when user releases fire input */
 	UFUNCTION()
 	void HandleFireReleased();
@@ -54,7 +52,7 @@ public:
 	UPROPERTY(Replicated)
 	bool bIsShoot = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+	UPROPERTY(EditAnywhere, Replicated, BlueprintReadWrite, Category = "Weapon")
 	TSubclassOf<AUT_Flak> WeaponClasses;
 
 	/** Currently equipped weapon instance */

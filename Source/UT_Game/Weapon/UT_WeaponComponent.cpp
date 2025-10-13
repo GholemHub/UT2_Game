@@ -220,6 +220,7 @@ void UUT_WeaponComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	//DOREPLIFETIME(UUT_WeaponComponent, CurrentWeaponIndex);
+	DOREPLIFETIME(UUT_WeaponComponent, WeaponClasses);
 	DOREPLIFETIME(UUT_WeaponComponent, Weapon);
 	DOREPLIFETIME(UUT_WeaponComponent, bIsShoot);
 }

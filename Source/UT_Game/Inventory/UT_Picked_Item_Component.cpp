@@ -39,7 +39,27 @@ void UUT_Picked_Item_Component::ChangeItemState(EItemState NewState, AActor* Pla
 	CurrentItemState = NewState;
 	OwnerPlayer = Player;
 	if (!Owner) return;
-	if (NewState == EItemState::AmmoEquipp)
+	if (NewState == EItemState::AmmoRedeemerEquipp)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ItemState is AmmoEquipp"));
+		auto Item = Cast<AAmmoClass>(GetOwner());
+		if (Item)
+		{
+			APlayerController* PC = Cast<APlayerController>(Player->GetInstigatorController());
+			if (PC)
+			{
+				AUT_GameCharacter* OwningPawn = Cast<AUT_GameCharacter>(PC->GetPawn()); // This is the local client's pawn
+
+				if (OwningPawn) {
+					if (!OwningPawn->WeaponComponent->Weapon) return;
+					OwningPawn->WeaponComponent->Weapon->Ammo += Item->AmmoCount * 2;
+					Item->Destroy();
+				}
+			}	
+		}
+	}
+
+	if (NewState == EItemState::AmmoFlakEquipp)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("ItemState is AmmoEquipp"));
 		auto Item = Cast<AAmmoClass>(GetOwner());
@@ -55,7 +75,7 @@ void UUT_Picked_Item_Component::ChangeItemState(EItemState NewState, AActor* Pla
 					OwningPawn->WeaponComponent->Weapon->Ammo += Item->AmmoCount;
 					Item->Destroy();
 				}
-			}	
+			}
 		}
 	}
 	if (NewState == EItemState::Hold)

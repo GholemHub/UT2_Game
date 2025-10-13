@@ -7,6 +7,9 @@
 
 #include "UT_AICharacter.generated.h"
 
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStateChanged, int, NewState);
+
 /**
  * 
  */
@@ -15,7 +18,11 @@ class UT_GAME_API AUT_AICharacter : public AUT_GameCharacter
 {
 	GENERATED_BODY()
 public:
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated,  Category = State)
+    UPROPERTY(BlueprintAssignable, Category = "State")
+    FOnStateChanged OnStateChanged;
+    UFUNCTION()
+    void On_AIStateReplicate();
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, ReplicatedUsing = On_AIStateReplicate,  Category = State)
     int AIState = 2;
 	AUT_AICharacter(const FObjectInitializer& ObjInit);
     AUT_AICharacter() { }
@@ -39,5 +46,22 @@ public:
 	class UBehaviorTree* BechaviorTreeAsset;
 
 	virtual void BeginPlay() override;
+    virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Timer)
+    int GodLikeTimer = 5;
+private:
+
+  
+    FTimerHandle GodModeTimer;
+
+    UFUNCTION()
+    void GodModeOff();
+
+    UFUNCTION()
+    void GodModeOn();
+
+    bool bGodMode = true;
+    
 
 };

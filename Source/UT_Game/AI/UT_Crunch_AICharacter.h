@@ -33,7 +33,8 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class USphereComponent* DanageZoneComponentSphere;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
+	float Damage = 20.f;
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime);
 

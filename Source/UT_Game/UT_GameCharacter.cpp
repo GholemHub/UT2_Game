@@ -348,9 +348,15 @@ void AUT_GameCharacter::Multicast_PickUpItem_Implementation(AActor* TargetItem)
 	auto Ammo = Cast<AAmmoClass>(TargetItem);
 	if (Ammo) {
 		auto ItemComponent = TargetItem->FindComponentByClass<UUT_Picked_Item_Component>();
-		if (!ItemComponent) return;
-
-		ItemComponent->ChangeItemState(EItemState::AmmoEquipp, this);
+        if (!ItemComponent || !WeaponComponent || !WeaponComponent->Weapon) return;
+			if (WeaponComponent->Weapon->WeaponName == TEXT("FLAK"))
+			{
+				ItemComponent->ChangeItemState(EItemState::AmmoFlakEquipp, this);
+			}
+			else if (WeaponComponent->Weapon->WeaponName == TEXT("REDEEMER")) {
+				ItemComponent->ChangeItemState(EItemState::AmmoRedeemerEquipp, this);
+			}
+		
 	}
 }
 
@@ -371,7 +377,22 @@ void AUT_GameCharacter::Client_UpdateDamageUI_Implementation(float DamageAmount)
 
 float AUT_GameCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	if (Health <= 0.0f)
+	auto Shooter = Cast<AUT_GameCharacter>(DamageCauser);
+
+
+	if (!Shooter || Shooter == this) return 0.0f;
+	
+	if (IsPlayerControlled() && Shooter->IsPlayerControlled())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Friendly fire blocked: %s -> %s"),
+			*Shooter->GetName(), *GetName());
+		return 0.0f;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("fire from to : %s -> %s"),
+		*Shooter->GetName(), *GetName());
+	
+	if (Health <= 0.5f)
 	{
 		Die();
 	}
@@ -384,7 +405,6 @@ float AUT_GameCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Dama
 
 	//OnDamageAplyed.Broadcast(this, DamageApplied);
 	if (UTPlayerState == EUTPlayerState::Death) return 0.0f;
-	auto Shooter = Cast<AUT_GameCharacter>(DamageCauser->GetOwner());
 	if (Shooter && Shooter->IsPlayerControlled())
 	{
 		if (HasAuthority()) // server only
@@ -426,45 +446,82 @@ void AUT_GameCharacter::PossessedBy(AController* NewController)
 
 void AUT_GameCharacter::Die()
 {
-	UTPlayerState = EUTPlayerState::Death;
+	if (UTPlayerState == EUTPlayerState::Death)
+		return;
 
+	UTPlayerState = EUTPlayerState::Death;
 	if (!IsValid(GetWorld())) return;
 
 	OnAIStateChangedWithParam.Broadcast(UTPlayerState);
-
 	DropItem();
 	GetCharacterMovement()->DisableMovement();
-
-	// Enable ragdoll
-	Multicast_Ragdoll();
-
-	// Hide collision so it won't block anything
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	// Start ragdoll visual
+	Multicast_Ragdoll();
 
 	if (HasAuthority())
 	{
-		// Schedule destroy after ragdoll plays for a few seconds
-		FTimerHandle DestroyTimer;
-		GetWorld()->GetTimerManager().SetTimer(
-			DestroyTimer,
-			[SafeThis = TWeakObjectPtr<AUT_GameCharacter>(this)]()
-			{
-				if (!SafeThis.IsValid()) return;
+		AController* DeadController = GetController();
 
-				// Optional: hide mesh before destroy
-				if (USkeletalMeshComponent* Mesh = SafeThis->GetMesh())
+		// Disable input for players
+		if (APlayerController* PC = Cast<APlayerController>(DeadController))
+		{
+			PC->SetIgnoreMoveInput(true);
+			PC->SetIgnoreLookInput(true);
+		}
+
+		// Different logic for player vs AI
+		if (DeadController && DeadController->IsPlayerController())
+		{
+			//  Player — respawn after delay
+			FTimerHandle RespawnTimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(
+				RespawnTimerHandle,
+				[WeakController = TWeakObjectPtr<AController>(DeadController), this]()
 				{
-					Mesh->SetVisibility(false, true);
-					Mesh->SetSimulatePhysics(false);
-				}
+					if (!WeakController.IsValid()) return;
 
-				SafeThis->Destroy();
-			},
-			5.0f, // ragdoll duration
-			false
-		);
+					if (UWorld* World = GetWorld())
+					{
+						if (AGameModeBase* GM = UGameplayStatics::GetGameMode(World))
+						{
+							GM->RestartPlayer(WeakController.Get());
+						}
+					}
+					Destroy();
+				},
+				5.0f,
+				false
+			);
+		}
+		else
+		{
+			// AI — destroy after delay
+			FTimerHandle DestroyTimer;
+			GetWorld()->GetTimerManager().SetTimer(
+				DestroyTimer,
+				[WeakThis = TWeakObjectPtr<AUT_GameCharacter>(this)]()
+				{
+					if (!WeakThis.IsValid()) return;
+
+					if (USkeletalMeshComponent* Mesh = WeakThis->GetMesh())
+					{
+						Mesh->SetSimulatePhysics(false);
+						Mesh->SetVisibility(false, true);
+					}
+
+					WeakThis->Destroy();
+				},
+				5.0f, // wait for ragdoll to fall
+				false
+			);
+		}
+
+		DetachFromControllerPendingDestroy();
 	}
 }
+
 
 void AUT_GameCharacter::Multicast_Ragdoll_Implementation()
 {

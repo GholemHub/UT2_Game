@@ -13,7 +13,8 @@ enum class EItemState : uint8
 {
 	Dropped     UMETA(DisplayName = "Dropped"),
 	Hold		UMETA(DisplayName = "Hold"),
-	AmmoEquipp		UMETA(DisplayName = "AmmoEquipp"),
+	AmmoFlakEquipp		UMETA(DisplayName = "AmmoFlakEquipp"),
+	AmmoRedeemerEquipp		UMETA(DisplayName = "AmmoRedeemerEquipp"),
 	NON			UMETA(DisplayName = "NON"),
 	
 };
