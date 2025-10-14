@@ -201,6 +201,8 @@ public:
 
 	float GetAO_Pitch() const { return AO_PITCH; }
 	float GetHealth() const { return Health; } 
+	UFUNCTION()
+	bool AddHealth(float AddHealth);
 	UFUNCTION(Server, Reliable)
 	void Server_DropItem();
 	UFUNCTION(NetMulticast, Reliable)
@@ -231,7 +233,7 @@ protected:
 
 	
 
-	UPROPERTY(EditDefaultsOnly, Category = "Health")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 	float MaxHealth = 100.0f;
 	UFUNCTION(BlueprintCallable)
 	void Die();

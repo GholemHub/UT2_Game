@@ -5,6 +5,8 @@
 #include "../Weapon/UT_Flak.h"
 #include "Blueprint/UserWidget.h"
 #include "../UT_GameCharacter.h"
+#include "../Inventory/FirstAidKit_Item.h"
+
 #include "../Weapon/AmmoClass.h"
 
 // Sets default values for this component's properties
@@ -39,6 +41,28 @@ void UUT_Picked_Item_Component::ChangeItemState(EItemState NewState, AActor* Pla
 	CurrentItemState = NewState;
 	OwnerPlayer = Player;
 	if (!Owner) return;
+	if (NewState == EItemState::FirstAidEquipp)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ItemState is FirstAidEquipp"));
+		auto Item = Cast<AFirstAidKit_Item>(GetOwner());
+		if (Item)
+		{
+			
+			APlayerController* PC = Cast<APlayerController>(Player->GetInstigatorController());
+			if (PC)
+			{
+				AUT_GameCharacter* OwningPawn = Cast<AUT_GameCharacter>(PC->GetPawn()); // This is the local client's pawn
+
+				if (OwningPawn) {
+					UE_LOG(LogTemp, Warning, TEXT("!!!ChangeItemState "));
+					if (OwningPawn->AddHealth(Item->AmmoCount))
+					{
+						Item->Destroy();
+					}	
+				}
+			}
+		}
+	}
 	if (NewState == EItemState::AmmoRedeemerEquipp)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("ItemState is AmmoEquipp"));

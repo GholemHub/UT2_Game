@@ -3,19 +3,18 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "../Inventory/UT_ItemClass.h"
 #include "GameFramework/Actor.h"
-#include "AmmoClass.generated.h"
+#include "../Inventory/UT_ItemClass.h"
+#include "FirstAidKit_Item.generated.h"
 
 UCLASS()
-class UT_GAME_API AAmmoClass : public AUT_ItemClass
+class UT_GAME_API AFirstAidKit_Item : public AUT_ItemClass
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AAmmoClass();
-	
+	AFirstAidKit_Item();
 
 protected:
 	// Called when the game starts or when spawned

@@ -15,6 +15,7 @@ enum class EItemState : uint8
 	Hold		UMETA(DisplayName = "Hold"),
 	AmmoFlakEquipp		UMETA(DisplayName = "AmmoFlakEquipp"),
 	AmmoRedeemerEquipp		UMETA(DisplayName = "AmmoRedeemerEquipp"),
+	FirstAidEquipp		UMETA(DisplayName = "FirstAidEquipp"),
 	NON			UMETA(DisplayName = "NON"),
 	
 };

@@ -331,6 +331,8 @@ void AUT_GameCharacter::Server_PickUpItem_Implementation(AActor* TargetItem)
 	Multicast_PickUpItem(TargetItem);
 }
 
+#include "Inventory/FirstAidKit_Item.h"
+
 void AUT_GameCharacter::Multicast_PickUpItem_Implementation(AActor* TargetItem)
 {
 	auto Weapon = Cast<AUT_Flak>(TargetItem);
@@ -356,7 +358,14 @@ void AUT_GameCharacter::Multicast_PickUpItem_Implementation(AActor* TargetItem)
 			else if (WeaponComponent->Weapon->WeaponName == TEXT("REDEEMER")) {
 				ItemComponent->ChangeItemState(EItemState::AmmoRedeemerEquipp, this);
 			}
-		
+	}
+
+	auto FirstAid = Cast<AFirstAidKit_Item>(TargetItem);
+
+	if (FirstAid) {
+		auto ItemComponent = TargetItem->FindComponentByClass<UUT_Picked_Item_Component>();
+		if (!ItemComponent) return;
+			ItemComponent->ChangeItemState(EItemState::FirstAidEquipp, this);
 	}
 }
 
@@ -375,13 +384,36 @@ void AUT_GameCharacter::Client_UpdateDamageUI_Implementation(float DamageAmount)
 
 
 
-float AUT_GameCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+float AUT_GameCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
+	AController* EventInstigator, AActor* DamageCauser)
 {
-	auto Shooter = Cast<AUT_GameCharacter>(DamageCauser);
+	AUT_GameCharacter* Shooter = nullptr;
 
+	UE_LOG(LogTemp, Warning, TEXT("TakeDamage called: Causer=%s Instigator=%s"),
+		*GetNameSafe(DamageCauser),
+		*GetNameSafe(EventInstigator ? EventInstigator->GetPawn() : nullptr));
 
-	if (!Shooter || Shooter == this) return 0.0f;
-	
+	// Try get from instigator first
+	if (EventInstigator)
+	{
+		Shooter = Cast<AUT_GameCharacter>(EventInstigator->GetPawn());
+	}
+
+	//  Fallback — maybe the damage causer itself is the character (like melee)
+	if (!Shooter && DamageCauser)
+	{
+		Shooter = Cast<AUT_GameCharacter>(DamageCauser);
+		if (!Shooter && DamageCauser->GetOwner())
+		{
+			Shooter = Cast<AUT_GameCharacter>(DamageCauser->GetOwner());
+		}
+	}
+
+	// 3 Now validate
+	if (!Shooter || Shooter == this)
+		return 0.0f;
+
+	//  Optional friendly fire check
 	if (IsPlayerControlled() && Shooter->IsPlayerControlled())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Friendly fire blocked: %s -> %s"),
@@ -389,22 +421,18 @@ float AUT_GameCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Dama
 		return 0.0f;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("fire from to : %s -> %s"),
-		*Shooter->GetName(), *GetName());
-	
-	if (Health <= 0.5f)
+	//  Continue with applying damage
+	float DamageApplied = FMath::Min(Health, DamageAmount);
+	Health -= DamageApplied;
+	DamageApplied = static_cast<float>(FMath::RoundToInt(DamageApplied));
+
+	UE_LOG(LogTemp, Warning, TEXT("%s damaged %s for %.1f"), *Shooter->GetName(), *GetName(), DamageApplied);
+
+	if (Health <= 0.0f)
 	{
 		Die();
 	}
-	
-	float DamageApplied = FMath::Min(Health, DamageAmount);
 
-	Health -= DamageApplied;
-
-	DamageApplied = (float)FMath::RoundToInt(DamageApplied);
-
-	//OnDamageAplyed.Broadcast(this, DamageApplied);
-	if (UTPlayerState == EUTPlayerState::Death) return 0.0f;
 	if (Shooter && Shooter->IsPlayerControlled())
 	{
 		if (HasAuthority()) // server only
@@ -413,20 +441,10 @@ float AUT_GameCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Dama
 		}
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("!!!!!!!!!! Damage done %s :: %f"), *DamageCauser->GetOwner()->GetName(), DamageApplied);
-
-
-	//PlayerWidgetInstance->SetHealthText(Health);
-	
-
-// How to add here the widget
-	if (Health <= 0.0f)
-	{
-		Die();
-	}
-	
 	return DamageApplied;
 }
+
+
 
 void AUT_GameCharacter::PossessedBy(AController* NewController)
 {
@@ -554,6 +572,21 @@ void AUT_GameCharacter::Server_SwitchWeapon_Implementation()
 	{
 		WeaponComponent->SwitchWeapon();
 	}
+}
+
+bool AUT_GameCharacter::AddHealth(float AddHealth)
+{
+	UE_LOG(LogTemp, Warning, TEXT("AddHealth %f"), AddHealth);
+	if (Health == MaxHealth) return false;
+
+	Health += AddHealth;
+	
+	if (Health >= MaxHealth) 
+	{
+		Health = MaxHealth;
+	} 
+	
+	return true;
 }
 
 void AUT_GameCharacter::MakeHit()

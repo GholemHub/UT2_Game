@@ -81,22 +81,33 @@ void AUT_Flak::ServerFire_Implementation(FVector_NetQuantizeNormal ShootDirectio
 void AUT_Flak::Multicast_ActuallyFire(FVector_NetQuantizeNormal ShootDirection, FVector_NetQuantize FireOrigin)
 {
 	bCanFire = false;
-	
+
 	UE_LOG(LogTemp, Warning, TEXT("Looking for some fire 11"));
+
 	if (!Projectile || !GetWorld()) return;
 
 	FActorSpawnParameters Params;
-	Params.Owner = GetOwner();
-	Params.Instigator = GetInstigator();
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	Params.Owner = GetOwner(); // The weapon's owner (character)
+
+	//  Ensure the Instigator is the *pawn* that owns the weapon
+	APawn* PawnOwner = Cast<APawn>(GetOwner());
+	if (PawnOwner)
+	{
+		Params.Instigator = PawnOwner;
+	}
 
 	FTransform SpawnTransform(FRotator::ZeroRotator, FireOrigin);
 	AUT_Flak_Projectile* Pr = GetWorld()->SpawnActor<AUT_Flak_Projectile>(Projectile, SpawnTransform, Params);
-	UE_LOG(LogTemp, Warning, TEXT("Looking for some fire 1"));
 
 	if (Pr)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Projectile spawned: %s | Owner: %s | Instigator: %s"),
+			*Pr->GetName(),
+			Pr->GetOwner() ? *Pr->GetOwner()->GetName() : TEXT("None"),
+			Pr->GetInstigator() ? *Pr->GetInstigator()->GetName() : TEXT("None"));
+
 		Pr->MakeShot(ShootDirection);
-		
 		PlayMuzzleFlash();
 	}
 
