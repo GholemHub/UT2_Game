@@ -4,6 +4,8 @@
 #include "Sound/SoundCue.h"
 #include "Engine/Engine.h"
 #include "DrawDebugHelpers.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 
 // Sets default values
@@ -39,6 +41,8 @@ void AUT_Flak_Projectile::BeginPlay()
     MeshComponent->OnComponentHit.AddUniqueDynamic(this, &AUT_Flak_Projectile::OnHit);
 
 }
+#include "../AI/UT_AICharacter.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 void AUT_Flak_Projectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
@@ -60,12 +64,34 @@ void AUT_Flak_Projectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor
                 UDamageType::StaticClass(), TArray<AActor*>(),
                 this, InstigatorController, true
             );
+            //if (OtherComp && OtherComp->IsSimulatingPhysics())
+            //{
+            //    // Apply physics impulse directly if object has simulating component
+            //    FVector ImpactDirection = Hit.ImpactNormal * -1.0f; // Push away from hit surface
+            //    float ImpulseStrength = 50000.0f; // tweak this
+            //    OtherComp->AddImpulseAtLocation(ImpactDirection * ImpulseStrength, Hit.ImpactPoint);
+            //}
+            //else
+            //{
+            //    auto HitCharacter = Cast<AUT_AICharacter>(OtherActor);
+            //    if (HitCharacter && HitCharacter->GetCharacterMovement()->MovementMode != MOVE_None)
+            //    {
 
+            //        FVector LaunchDir = MeshComponent->GetPhysicsLinearVelocity().GetSafeNormal();
+            //        if (LaunchDir.IsNearlyZero())
+            //        {
+            //            LaunchDir = GetActorForwardVector();
+            //        }
+            //        LaunchDir.Z = 0.001f;
 
-           /* DrawDebugSphere(
-                GetWorld(), Hit.ImpactPoint, 200.0f, 12,
-                FColor::Red, false, 2.0f, 0, 1.5f
-            );*/
+            //        float KnockbackStrength = 1000.0f; // adjust as needed
+            //        FVector Knockback = LaunchDir * KnockbackStrength;
+
+            //        // Apply impulse to enemy movement
+            //        HitCharacter->GetCharacterMovement()->AddImpulse(Knockback, true);
+            //    }
+            //}
+            
         }
         else {
             float RandomValue = FMath::FRandRange(Damage - 2.0f, Damage + 2.0f);
@@ -73,6 +99,38 @@ void AUT_Flak_Projectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor
                 OtherActor, RandomValue, InstigatorController,
                 this, UDamageType::StaticClass()
             );
+
+            //if (OtherComp && OtherComp->IsSimulatingPhysics())
+            //{
+            //    // Apply physics impulse directly if object has simulating component
+            //    FVector ImpactDirection = Hit.ImpactNormal * -1.0f; // Push away from hit surface
+            //    float ImpulseStrength = 5000.0f; // tweak this
+            //    OtherComp->AddImpulseAtLocation(ImpactDirection * ImpulseStrength, Hit.ImpactPoint);
+            //}
+            //else
+            //{
+            //    auto HitCharacter = Cast<AUT_AICharacter>(OtherActor);
+            //    if (HitCharacter && HitCharacter->GetCharacterMovement()->MovementMode != MOVE_None)
+            //    {
+            //      
+            //        FVector LaunchDir = MeshComponent->GetPhysicsLinearVelocity().GetSafeNormal();
+            //        if (LaunchDir.IsNearlyZero())
+            //        {
+            //            LaunchDir = GetActorForwardVector();
+            //        }
+            //        LaunchDir.Z = 0.001f;
+            //        UE_LOG(LogTemp, Warning, TEXT("KnockBack:::%s"), *LaunchDir.ToString());
+            //            //LaunchDir.Normalize();
+            //        UE_LOG(LogTemp, Warning, TEXT("KnockBack22:::%s"), *LaunchDir.ToString());
+
+            //        float KnockbackStrength = 300.0f; // adjust as needed
+            //        FVector Knockback = LaunchDir * KnockbackStrength;
+
+            //        // Apply impulse to enemy movement
+            //        HitCharacter->GetCharacterMovement()->AddImpulse(Knockback, true);
+            //    }
+
+            //}
         }
     }
 

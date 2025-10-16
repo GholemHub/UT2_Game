@@ -15,7 +15,8 @@ class UT_GAME_API AAmmoClass : public AUT_ItemClass
 public:	
 	// Sets default values for this actor's properties
 	AAmmoClass();
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = UI)
+	int AmmoType = 0;
 
 protected:
 	// Called when the game starts or when spawned

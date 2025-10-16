@@ -29,6 +29,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnFireReleased);
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnDamageAplyed, AActor*, DamagedActor, float, DamageAmount);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnPickUpUI, AActor*, OwnerActor, AActor*, PickedUpActor);
+
 
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
@@ -50,6 +52,11 @@ class AUT_GameCharacter : public ACharacter, public IGenericTeamAgentInterface
 	GENERATED_BODY()
 public:
 
+	UPROPERTY(BlueprintAssignable, Category = "UI")
+	FOnPickUpUI OnPickUpUI;
+
+	UFUNCTION(BlueprintCallable)
+	void UpdateUIPickUp(AActor* Player, AActor* PickedUpActor);
 
 	UFUNCTION(Client, Reliable)
 	void Client_UpdateDamageUI(float DamageAmount);
@@ -228,7 +235,7 @@ protected:
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 	virtual void PossessedBy(AController* NewController) override;
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = "Health")
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadOnly, Category = "Health")
 	float Health = 100.0f;
 
 	

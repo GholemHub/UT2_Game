@@ -6,7 +6,6 @@
 #include "Blueprint/UserWidget.h"
 #include "../UT_GameCharacter.h"
 #include "../Inventory/FirstAidKit_Item.h"
-
 #include "../Weapon/AmmoClass.h"
 
 // Sets default values for this component's properties
@@ -24,6 +23,7 @@ void UUT_Picked_Item_Component::BeginPlay()
 { 
 	Super::BeginPlay();
 	Owner = GetOwner();
+	
 }
 
 
@@ -38,6 +38,8 @@ void UUT_Picked_Item_Component::TickComponent(float DeltaTime, ELevelTick TickTy
 
 void UUT_Picked_Item_Component::ChangeItemState(EItemState NewState, AActor* Player)
 {
+
+
 	CurrentItemState = NewState;
 	OwnerPlayer = Player;
 	if (!Owner) return;
@@ -57,6 +59,8 @@ void UUT_Picked_Item_Component::ChangeItemState(EItemState NewState, AActor* Pla
 					UE_LOG(LogTemp, Warning, TEXT("!!!ChangeItemState "));
 					if (OwningPawn->AddHealth(Item->AmmoCount))
 					{
+						OwningPawn->OnPickUpUI.Broadcast(OwningPawn, Item);
+
 						Item->Destroy();
 					}	
 				}
@@ -76,7 +80,8 @@ void UUT_Picked_Item_Component::ChangeItemState(EItemState NewState, AActor* Pla
 
 				if (OwningPawn) {
 					if (!OwningPawn->WeaponComponent->Weapon) return;
-					OwningPawn->WeaponComponent->Weapon->Ammo += Item->AmmoCount * 2;
+					OwningPawn->OnPickUpUI.Broadcast(OwningPawn, Item);
+					OwningPawn->WeaponComponent->Weapon->Ammo += Item->AmmoCount;
 					Item->Destroy();
 				}
 			}	
@@ -95,6 +100,7 @@ void UUT_Picked_Item_Component::ChangeItemState(EItemState NewState, AActor* Pla
 				AUT_GameCharacter* OwningPawn = Cast<AUT_GameCharacter>(PC->GetPawn()); // This is the local client's pawn
 
 				if (OwningPawn) {
+					OwningPawn->OnPickUpUI.Broadcast(OwningPawn, Item);
 					if (!OwningPawn->WeaponComponent->Weapon) return;
 					OwningPawn->WeaponComponent->Weapon->Ammo += Item->AmmoCount;
 					Item->Destroy();
@@ -116,6 +122,7 @@ void UUT_Picked_Item_Component::ChangeItemState(EItemState NewState, AActor* Pla
 				AUT_GameCharacter* OwningPawn = Cast<AUT_GameCharacter>(PC->GetPawn()); // This is the local client's pawn
 			
 				if (OwningPawn) {
+					OwningPawn->OnPickUpUI.Broadcast(OwningPawn, Item);
 					OwningPawn->WeaponComponent->EquipNewWeapon(Item);
 					OwningPawn->bEquipped = true;
 					UE_LOG(LogTemp, Warning, TEXT("WeaponbEquipped"));
@@ -141,7 +148,10 @@ void UUT_Picked_Item_Component::ChangeItemState(EItemState NewState, AActor* Pla
 		}
 		UE_LOG(LogTemp, Warning, TEXT("ItemState is Dropped111"));
 	}
+
+	
 }
+
 
 void UUT_Picked_Item_Component::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {

@@ -8,6 +8,7 @@
 #include "UT_Picked_Item_Component.generated.h"
 
 
+
 UENUM(BlueprintType)
 enum class EItemState : uint8
 {
@@ -34,6 +35,8 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
+
+
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
@@ -42,6 +45,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void ChangeItemState(EItemState NewState, AActor* Player);
+	
 
 	UPROPERTY()
 	AActor* OwnerPlayer;

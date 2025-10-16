@@ -192,11 +192,18 @@ void AUT_GameCharacter::BeginPlay()
 {
 
 	Super::BeginPlay();
+	Health = MaxHealth;
 	UTPlayerState = EUTPlayerState::Alive;
 	//if (!WeaponComponent) return;
 	//GetWorldTimerManager().SetTimerForNextTick(this, &AUT_GameCharacter::AssignPlayerNumber);
 
 	OnDamageAplyed.AddDynamic(this, &AUT_GameCharacter::UpdateUIDamage);
+	OnPickUpUI.AddDynamic(this, &AUT_GameCharacter::UpdateUIPickUp);
+}
+
+void AUT_GameCharacter::UpdateUIPickUp(AActor* Player, AActor* PickedUpActor)
+{
+	UE_LOG(LogTemp, Warning, TEXT("UI PickUp:: %s :: %s"), *GetNameSafe(Player), *GetNameSafe(PickedUpActor));
 }
 
 
@@ -335,6 +342,8 @@ void AUT_GameCharacter::Server_PickUpItem_Implementation(AActor* TargetItem)
 
 void AUT_GameCharacter::Multicast_PickUpItem_Implementation(AActor* TargetItem)
 {
+
+
 	auto Weapon = Cast<AUT_Flak>(TargetItem);
 	if (Weapon) {
 		if (bEquipped == true) return;
@@ -350,14 +359,18 @@ void AUT_GameCharacter::Multicast_PickUpItem_Implementation(AActor* TargetItem)
 	auto Ammo = Cast<AAmmoClass>(TargetItem);
 	if (Ammo) {
 		auto ItemComponent = TargetItem->FindComponentByClass<UUT_Picked_Item_Component>();
-        if (!ItemComponent || !WeaponComponent || !WeaponComponent->Weapon) return;
-			if (WeaponComponent->Weapon->WeaponName == TEXT("FLAK"))
-			{
+		if (!ItemComponent || !WeaponComponent || !WeaponComponent->Weapon) return;
+		if (WeaponComponent->Weapon->WeaponName == TEXT("FLAK"))
+		{
+			if (Ammo->AmmoType == 0) {
 				ItemComponent->ChangeItemState(EItemState::AmmoFlakEquipp, this);
 			}
-			else if (WeaponComponent->Weapon->WeaponName == TEXT("REDEEMER")) {
-				ItemComponent->ChangeItemState(EItemState::AmmoRedeemerEquipp, this);
+		}
+		else if (WeaponComponent->Weapon->WeaponName == TEXT("REDEEMER")) {
+			if (Ammo->AmmoType == 1) {
+				ItemComponent->ChangeItemState(EItemState::AmmoFlakEquipp, this);
 			}
+		}
 	}
 
 	auto FirstAid = Cast<AFirstAidKit_Item>(TargetItem);

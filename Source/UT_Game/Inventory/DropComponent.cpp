@@ -34,18 +34,21 @@ void UDropComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 
 void UDropComponent::DropItem(EUTPlayerState NewState)
 {
-    UE_LOG(LogTemp, Warning, TEXT("SpawnActorOnLevel:DROPITEM"));
+    float RandomValue = FMath::RandRange(0,2);
+
+    if (RandomValue > 1) return;
+    //UE_LOG(LogTemp, Warning, TEXT("SpawnActorOnLevel:DROPITEM"));
 
     if (!Drop)
     {
-        UE_LOG(LogTemp, Warning, TEXT("SpawnActorOnLevel: ActorClass is null!"));
+       //UE_LOG(LogTemp, Warning, TEXT("SpawnActorOnLevel: ActorClass is null!"));
         return;
     }
 
     UWorld* World = GetWorld();
     if (!World)
     {
-        UE_LOG(LogTemp, Warning, TEXT("SpawnActorOnLevel: No valid world!"));
+       // UE_LOG(LogTemp, Warning, TEXT("SpawnActorOnLevel: No valid world!"));
         return;
     }
 
@@ -65,11 +68,11 @@ void UDropComponent::DropItem(EUTPlayerState NewState)
 
     if (SpawnedActor)
     {
-        UE_LOG(LogTemp, Warning, TEXT("Spawned actor: %s at %s"), *SpawnedActor->GetName(), *Location.ToString());
+        //UE_LOG(LogTemp, Warning, TEXT("Spawned actor: %s at %s"), *SpawnedActor->GetName(), *Location.ToString());
     }
     else
     {
-        UE_LOG(LogTemp, Error, TEXT("Failed to spawn actor!"));
+       // UE_LOG(LogTemp, Error, TEXT("Failed to spawn actor!"));
     }
 }
 
