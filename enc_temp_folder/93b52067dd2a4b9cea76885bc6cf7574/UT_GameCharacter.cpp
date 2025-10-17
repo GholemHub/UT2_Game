@@ -30,33 +30,6 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 
 
-AUT_GameCharacter::AUT_GameCharacter()
-{
-	// Set size for collision capsule
-	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
-	WeaponComponent = CreateDefaultSubobject<UUT_WeaponComponent>(TEXT("UTWeaponComponent"));
-
-	Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh1P"));
-	Mesh1P->SetupAttachment(GetCapsuleComponent());
-
-
-	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
-	FirstPersonCameraComponent->SetRelativeLocation(FVector(-10.f, 0.f, 60.f)); // Position the camera
-	FirstPersonCameraComponent->bUsePawnControlRotation = true;
-
-	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
-
-	SpringArm->SetupAttachment(Mesh1P, "head");
-
-	SpringArm->bUsePawnControlRotation = true;     // Rotate arm based on controller
-	SpringArm->bEnableCameraLag = true;
-	SpringArm->CameraLagSpeed = 10.0f;
-
-	FirstPersonCameraComponent->SetupAttachment(SpringArm); // Replace "head" with your actual socket/bone name
-
-	GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;
-}
-
 void AUT_GameCharacter::Respawn() 
 { 
 	auto DeadCharacter = this;
@@ -76,6 +49,32 @@ void AUT_GameCharacter::UpdateUIDamage(AActor* Actor, float DamageAmount)
 	UE_LOG(LogTemp, Warning, TEXT("UpdateUIDamage"));
 }
 
+AUT_GameCharacter::AUT_GameCharacter()
+{
+	// Set size for collision capsule
+	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
+	WeaponComponent = CreateDefaultSubobject<UUT_WeaponComponent>(TEXT("UTWeaponComponent"));
+
+	Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh1P"));
+	Mesh1P->SetupAttachment(GetCapsuleComponent());
+
+	
+	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
+	FirstPersonCameraComponent->SetRelativeLocation(FVector(-10.f, 0.f, 60.f)); // Position the camera
+	FirstPersonCameraComponent->bUsePawnControlRotation = true;
+
+	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
+
+	SpringArm->SetupAttachment(Mesh1P, "head");
+
+	SpringArm->bUsePawnControlRotation = true;     // Rotate arm based on controller
+	SpringArm->bEnableCameraLag = true;
+	SpringArm->CameraLagSpeed = 10.0f;
+
+	FirstPersonCameraComponent->SetupAttachment(SpringArm); // Replace "head" with your actual socket/bone name
+
+	GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;
+}
 
 void AUT_GameCharacter::NotifyControllerChanged()
 {
@@ -123,7 +122,6 @@ void AUT_GameCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 void AUT_GameCharacter::UpdateDamageFunctionTemp(float DamageAmmount)
 {
-	if (DamageAmmount <= 1.0f) return;
 	DamageUI = DamageAmmount;
 	//UE_LOG(LogTemp, Warning, TEXT("UpdateUIDamage "));
 	OnDamageAplyed.Broadcast(this, DamageAmmount);

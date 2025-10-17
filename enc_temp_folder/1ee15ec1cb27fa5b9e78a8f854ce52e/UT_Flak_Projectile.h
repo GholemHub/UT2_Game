@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -7,7 +7,6 @@
 #include "Components/StaticMeshComponent.h"
 #include "Particles/ParticleSystem.h"
 #include "Particles/ParticleSystemComponent.h"
-#include "GameFramework/ProjectileMovementComponent.h" 
 
 #include "UT_Flak_Projectile.generated.h"
 
@@ -26,13 +25,7 @@ protected:
 
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
-	void OnOverlap(
-		UPrimitiveComponent* OverlappedComp,
-		AActor* OtherActor,
-		UPrimitiveComponent* OtherComp,
-		int32 OtherBodyIndex,
-		bool bFromSweep,
-		const FHitResult& SweepResult);
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -54,12 +47,7 @@ public:
 	void Multicast_PlayFireEffects(FVector ShootDirection);
 
 	UPROPERTY(EditAnywhere, Category = "Effects")
-	class UParticleSystemComponent* ParticleSystemComp;
-
-	UPROPERTY(EditAnywhere)
-	class UProjectileMovementComponent* ProjectileMovement;
-
-
+	UParticleSystemComponent* ParticleSystemComp;
 	UFUNCTION()
 	void DestroyAfterDelay();
 

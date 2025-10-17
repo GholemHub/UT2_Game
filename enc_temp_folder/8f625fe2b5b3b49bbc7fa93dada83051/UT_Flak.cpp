@@ -97,8 +97,7 @@ void AUT_Flak::Multicast_ActuallyFire(FVector_NetQuantizeNormal ShootDirection, 
 		Params.Instigator = PawnOwner;
 	}
 
-	FTransform SpawnTransform(ShootDirection.Rotation(), FireOrigin);
-
+	FTransform SpawnTransform(FRotator::ZeroRotator, FireOrigin);
 	AUT_Flak_Projectile* Pr = GetWorld()->SpawnActor<AUT_Flak_Projectile>(Projectile, SpawnTransform, Params);
 
 	if (Pr)

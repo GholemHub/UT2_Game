@@ -12,7 +12,7 @@ AUT_Redeemer_Projectile::AUT_Redeemer_Projectile()
         MeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
         MeshComponent->SetCollisionObjectType(ECC_PhysicsBody);
         MeshComponent->SetSimulatePhysics(true);
-        MeshComponent->SetEnableGravity(false);
+        MeshComponent->SetEnableGravity(true);
 }
 
 void AUT_Redeemer_Projectile::MakeShot(FVector ShootDirection)

@@ -9,7 +9,6 @@
 AUT_AICharacter::AUT_AICharacter(const FObjectInitializer& ObjInit)
 {
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
-
 }
 
 void AUT_AICharacter::BeginPlay()

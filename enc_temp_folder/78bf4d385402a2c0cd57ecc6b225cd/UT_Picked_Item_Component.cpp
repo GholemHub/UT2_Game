@@ -100,9 +100,8 @@ void UUT_Picked_Item_Component::ChangeItemState(EItemState NewState, AActor* Pla
 				AUT_GameCharacter* OwningPawn = Cast<AUT_GameCharacter>(PC->GetPawn()); // This is the local client's pawn
 
 				if (OwningPawn) {
-					
-					if (!OwningPawn->WeaponComponent->Weapon) return;
 					OwningPawn->OnPickUpUI.Broadcast(OwningPawn, Item);
+					if (!OwningPawn->WeaponComponent->Weapon) return;
 					OwningPawn->WeaponComponent->Weapon->Ammo += Item->AmmoCount;
 					Item->Destroy();
 				}
