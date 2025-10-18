@@ -46,6 +46,7 @@ public:
 
 	UPROPERTY(ReplicatedUsing = OnRep_TimerCountdown, EditAnywhere, BlueprintReadWrite, Category = Timer)
 	int TimerCoundDown = 10;
+	
 	int TimerCound = 10;
 	UFUNCTION()
 	void OnRep_TimerCountdown();

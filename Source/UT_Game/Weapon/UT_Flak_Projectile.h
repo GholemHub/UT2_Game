@@ -15,8 +15,8 @@ UCLASS()
 class UT_GAME_API AUT_Flak_Projectile : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	AUT_Flak_Projectile();
 
@@ -26,19 +26,20 @@ protected:
 
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
-	void OnOverlap(
+	UFUNCTION()
+	virtual void OnOverlap(
 		UPrimitiveComponent* OverlappedComp,
 		AActor* OtherActor,
 		UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex,
 		bool bFromSweep,
 		const FHitResult& SweepResult);
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
 	UStaticMeshComponent* MeshComponent;
-	
+
 	UPROPERTY(EditAnywhere, Category = Weapon)
 	float FireImpulse = 1000.f;
 
@@ -69,9 +70,14 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Damage")
 	bool WeaponIsRadial = true;
 
+	UPROPERTY(EditAnywhere, Category = "Damage")
+	float InitialSpeed = 2000.f;
+
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_ExplodeEffects(FVector Location);
 private:
 	bool bHasExploded = false;
+
+
 
 };

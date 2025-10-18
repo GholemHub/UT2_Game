@@ -25,12 +25,12 @@ AUT_Flak_Projectile::AUT_Flak_Projectile()
     MeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
     MeshComponent->SetCollisionObjectType(ECC_WorldDynamic);
     MeshComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
-    MeshComponent->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block); // блокуй лише світ
+    MeshComponent->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Overlap); // блокуй лише світ
     MeshComponent->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap); // або ігноруй
     MeshComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap); // персонажі — тільки оверлап
     MeshComponent->SetGenerateOverlapEvents(true);
 
-    MeshComponent->OnComponentBeginOverlap.AddDynamic(this, &AUT_Flak_Projectile::OnOverlap);
+    //MeshComponent->OnComponentBeginOverlap.AddDynamic(this, &AUT_Flak_Projectile::OnOverlap);
 
     //MeshComponent->OnComponentHit.AddDynamic(this, &AUT_Flak_Projectile::OnHit);
 
@@ -47,10 +47,10 @@ AUT_Flak_Projectile::AUT_Flak_Projectile()
 // Called when the game starts or when spawned
 void AUT_Flak_Projectile::BeginPlay()
 {
-	Super::BeginPlay();
- 
-    MeshComponent->OnComponentHit.AddUniqueDynamic(this, &AUT_Flak_Projectile::OnHit);
+    Super::BeginPlay();
 
+    MeshComponent->OnComponentHit.AddUniqueDynamic(this, &AUT_Flak_Projectile::OnHit);
+    MeshComponent->OnComponentBeginOverlap.AddDynamic(this, &AUT_Flak_Projectile::OnOverlap);
 }
 
 
@@ -74,34 +74,8 @@ void AUT_Flak_Projectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor
                 UDamageType::StaticClass(), TArray<AActor*>(),
                 this, InstigatorController, true
             );
-            //if (OtherComp && OtherComp->IsSimulatingPhysics())
-            //{
-            //    // Apply physics impulse directly if object has simulating component
-            //    FVector ImpactDirection = Hit.ImpactNormal * -1.0f; // Push away from hit surface
-            //    float ImpulseStrength = 50000.0f; // tweak this
-            //    OtherComp->AddImpulseAtLocation(ImpactDirection * ImpulseStrength, Hit.ImpactPoint);
-            //}
-            //else
-            //{
-            //    auto HitCharacter = Cast<AUT_AICharacter>(OtherActor);
-            //    if (HitCharacter && HitCharacter->GetCharacterMovement()->MovementMode != MOVE_None)
-            //    {
 
-            //        FVector LaunchDir = MeshComponent->GetPhysicsLinearVelocity().GetSafeNormal();
-            //        if (LaunchDir.IsNearlyZero())
-            //        {
-            //            LaunchDir = GetActorForwardVector();
-            //        }
-            //        LaunchDir.Z = 0.001f;
 
-            //        float KnockbackStrength = 1000.0f; // adjust as needed
-            //        FVector Knockback = LaunchDir * KnockbackStrength;
-
-            //        // Apply impulse to enemy movement
-            //        HitCharacter->GetCharacterMovement()->AddImpulse(Knockback, true);
-            //    }
-            //}
-            
         }
         else {
             float RandomValue = FMath::FRandRange(Damage - 2.0f, Damage + 2.0f);
@@ -110,63 +84,76 @@ void AUT_Flak_Projectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor
                 this, UDamageType::StaticClass()
             );
 
-            //if (OtherComp && OtherComp->IsSimulatingPhysics())
-            //{
-            //    // Apply physics impulse directly if object has simulating component
-            //    FVector ImpactDirection = Hit.ImpactNormal * -1.0f; // Push away from hit surface
-            //    float ImpulseStrength = 5000.0f; // tweak this
-            //    OtherComp->AddImpulseAtLocation(ImpactDirection * ImpulseStrength, Hit.ImpactPoint);
-            //}
-            //else
-            //{
-            //    auto HitCharacter = Cast<AUT_AICharacter>(OtherActor);
-            //    if (HitCharacter && HitCharacter->GetCharacterMovement()->MovementMode != MOVE_None)
-            //    {
-            //      
-            //        FVector LaunchDir = MeshComponent->GetPhysicsLinearVelocity().GetSafeNormal();
-            //        if (LaunchDir.IsNearlyZero())
-            //        {
-            //            LaunchDir = GetActorForwardVector();
-            //        }
-            //        LaunchDir.Z = 0.001f;
-            //        UE_LOG(LogTemp, Warning, TEXT("KnockBack:::%s"), *LaunchDir.ToString());
-            //            //LaunchDir.Normalize();
-            //        UE_LOG(LogTemp, Warning, TEXT("KnockBack22:::%s"), *LaunchDir.ToString());
-
-            //        float KnockbackStrength = 300.0f; // adjust as needed
-            //        FVector Knockback = LaunchDir * KnockbackStrength;
-
-            //        // Apply impulse to enemy movement
-            //        HitCharacter->GetCharacterMovement()->AddImpulse(Knockback, true);
-            //    }
-
-            //}
         }
     }
 
     Multicast_ExplodeEffects(Hit.ImpactPoint);
     FTimerHandle DestroyTimerHandle;
+
+    UE_LOG(LogTemp, Error, TEXT("OnHit :: END"));
     // Destroy after delay to allow VFX to play
     GetWorldTimerManager().SetTimer(DestroyTimerHandle, this, &AUT_Flak_Projectile::DestroyAfterDelay, 2.0f, false);
 }
 
 void AUT_Flak_Projectile::OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-    if (!OtherActor || OtherActor == this) return;
+    if (!OtherActor || OtherActor == this)
+        return;
 
+    FVector ExplosionLocation = GetActorLocation(); // default fallback
+
+    if (bFromSweep)
+    {
+        // Sometimes SweepResult.Location is valid when moving fast
+        ExplosionLocation = SweepResult.Location;
+    }
+    else if (OtherComp)
+    {
+        // If we overlapped a mesh or capsule, use its position
+        ExplosionLocation = OtherComp->GetComponentLocation();
+    }
+    else
+    {
+        ExplosionLocation = OtherActor->GetActorLocation();
+    }
+
+    UE_LOG(LogTemp, Error, TEXT("OnOverlap :: END :: %s"), *ExplosionLocation.ToString());
+
+    // Apply damage
     AController* InstigatorController = GetInstigatorController();
-    UGameplayStatics::ApplyDamage(OtherActor, Damage, InstigatorController, this, UDamageType::StaticClass());
 
-    // ефекти, звук і знищення
-    Multicast_ExplodeEffects(SweepResult.ImpactPoint);
-    Destroy();
+    
+    if (WeaponIsRadial) {
+        float RandomValue = FMath::FRandRange(Damage - 5.0f, Damage + 5.0f);
+        UGameplayStatics::ApplyRadialDamage(
+            this, RandomValue, ExplosionLocation, 200.f,
+            UDamageType::StaticClass(), TArray<AActor*>(),
+            this, InstigatorController, true
+        );
+    }
+    else {
+        float RandomValue = FMath::FRandRange(Damage - 2.0f, Damage + 2.0f);
+        UGameplayStatics::ApplyDamage(
+            OtherActor, RandomValue, InstigatorController,
+            this, UDamageType::StaticClass()
+        );
+    }
+    
+
+    //UGameplayStatics::ApplyDamage(OtherActor, Damage, InstigatorController, this, UDamageType::StaticClass());
+
+    // Visuals
+    Multicast_ExplodeEffects(ExplosionLocation);
+
+    FTimerHandle DestroyTimerHandle;
+    GetWorldTimerManager().SetTimer(DestroyTimerHandle, this, &AUT_Flak_Projectile::DestroyAfterDelay, 1.0f, false);
 }
 
 
 // Called every frame
 void AUT_Flak_Projectile::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
+    Super::Tick(DeltaTime);
     if (MeshComponent && MeshComponent->GetPhysicsLinearVelocity().SizeSquared() > 0.1f)
     {
         FVector Velocity = MeshComponent->GetPhysicsLinearVelocity();
@@ -177,7 +164,7 @@ void AUT_Flak_Projectile::Tick(float DeltaTime)
 
 void AUT_Flak_Projectile::MakeShot(FVector ShootDirection)
 {
-    UE_LOG(LogTemp, Warning, TEXT("Projectile prepared with name: %s"), *this->GetName());
+    UE_LOG(LogTemp, Warning, TEXT("Projectile prepared with name FLAKK: %s"), *this->GetName());
 
     if (!ShootDirection.IsNormalized())
     {

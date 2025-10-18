@@ -80,7 +80,7 @@ void AEnemy_WaveManager::MakeWave()
 
 		// Prepare for next wave
 		CurrentWave++;
-		TimerCoundDown = TimerCound + (CurrentWave * 5); // seconds break before next wave
+		TimerCoundDown = TimerCound + (CurrentWave * 20); // seconds break before next wave
 	}
 	else
 	{
@@ -96,9 +96,9 @@ void AEnemy_WaveManager::SpawnActorCranch()
 	if (!World) return;
 
 	FVector Origin = GetActorLocation();
-	//FVector RandomOffset = UKismetMathLibrary::RandomUnitVector() * 100.f;
+	FVector RandomOffset = UKismetMathLibrary::RandomUnitVector() * 100.f;
 	FVector SpawnLocation = Origin ;
-	FRotator SpawnRotation = FRotator::ZeroRotator;
+	FRotator SpawnRotation = FRotator(0, 0, 180);
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
@@ -125,7 +125,7 @@ void AEnemy_WaveManager::SpawnActorMurdock()
 	if (!World) return;
 
 	FVector Origin = GetActorLocation();
-	FVector RandomOffset = UKismetMathLibrary::RandomUnitVector() * 100.f;
+	FVector RandomOffset = UKismetMathLibrary::RandomUnitVector() * 150.f;
 	FVector SpawnLocation = Origin + RandomOffset;
 	FRotator SpawnRotation = FRotator::ZeroRotator;
 

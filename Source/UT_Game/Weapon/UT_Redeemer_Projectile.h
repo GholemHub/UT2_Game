@@ -14,6 +14,6 @@ class UT_GAME_API AUT_Redeemer_Projectile : public AUT_Flak_Projectile
 {
 	GENERATED_BODY()
 public:
-	AUT_Redeemer_Projectile();
+
 	virtual void MakeShot(FVector ShootDirection) override;
 };

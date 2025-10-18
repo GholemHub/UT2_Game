@@ -38,7 +38,7 @@ void AUT_Crunch_AICharacter::OnSphereBeginOverlap(
 	if (Crunch) return;
 
 	if (Player){
-		UE_LOG(LogTemp, Warning, TEXT("******Sphere overlapped with: %s"), *OtherActor->GetName());
+		//UE_LOG(LogTemp, Warning, TEXT("******Sphere overlapped with: %s"), *OtherActor->GetName());
 		bCanAtack = true;	
 	}
 }
@@ -52,7 +52,7 @@ void AUT_Crunch_AICharacter::OnSphereEndOverlap(
 {
 	auto Player = Cast<AUT_GameCharacter>(OtherActor);
 	if (Player) {
-		UE_LOG(LogTemp, Warning, TEXT("******Sphere Endlapped with: %s"), *OtherActor->GetName());
+		//UE_LOG(LogTemp, Warning, TEXT("******Sphere Endlapped with: %s"), *OtherActor->GetName());
 		bCanAtack = false;
 	}
 }
