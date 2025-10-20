@@ -117,6 +117,10 @@ void AUT_Flak_Projectile::OnOverlap(UPrimitiveComponent* OverlappedComp, AActor*
         ExplosionLocation = OtherActor->GetActorLocation();
     }
 
+    if (!HasAuthority() || bHasExploded) return;
+
+    bHasExploded = true; // Add a flag to prevent double execution
+
     UE_LOG(LogTemp, Error, TEXT("OnOverlap :: END :: %s"), *ExplosionLocation.ToString());
 
     // Apply damage
