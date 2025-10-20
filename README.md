@@ -146,6 +146,73 @@ Where to find: `AI/Controllers/*`, `AI/BT/*`, `AI/Blackboard/*`, `AI/Tasks/*`.
 
   * Clients perform cosmetic effects (muzzle flash, bullet tracers), while the server authoritatively applies gameplay effects.
 
+
+## 🧩 Example Code & Techniques
+
+### Example Class: `AUT_GameCharacter`
+> Core player character class combining **input, replication, combat, and UI logic** for both multiplayer and AI-driven gameplay.
+
+```cpp
+UCLASS(config=Game)
+class AUT_GameCharacter : public ACharacter, public IGenericTeamAgentInterface
+{
+    GENERATED_BODY()
+
+public:
+    // Delegates for firing and UI updates
+    UPROPERTY(BlueprintAssignable) FOnFirePressed OnFirePressed;
+    UPROPERTY(BlueprintAssignable) FOnDamageAplyed OnDamageAplyed;
+
+    // Weapon and camera components
+    UPROPERTY(EditAnywhere) UUT_WeaponComponent* WeaponComponent;
+    UPROPERTY(EditAnywhere) UCameraComponent* FirstPersonCameraComponent;
+
+    // State & replication
+    UPROPERTY(Replicated, EditAnywhere) EUTPlayerState UTPlayerState = EUTPlayerState::Alive;
+    UPROPERTY(Replicated) float Health = 100.f;
+
+    // Input & actions
+    virtual void SetupPlayerInputComponent(UInputComponent* Input) override;
+    UFUNCTION(Server, Reliable) void Server_SwitchWeapon();
+    UFUNCTION(NetMulticast, Reliable) void Multicast_Ragdoll();
+
+protected:
+    virtual void BeginPlay() override;
+    virtual float TakeDamage(float DamageAmount, const FDamageEvent&, AController*, AActor*) override;
+};
+```
+
+---
+
+### ⚙️ Techniques & Patterns Used
+
+**Component-based design**  
+Uses `UUT_WeaponComponent`, `UCameraComponent`, and `USpringArmComponent` for modularity.
+
+**Network Replication**  
+Replicates health, player state, and actions using `Server`, `Client`, and `NetMulticast` RPCs.
+
+**Delegates (Event-driven)**  
+Uses `DECLARE_DYNAMIC_MULTICAST_DELEGATE` for UI and gameplay events (fire, damage, pickup).
+
+**Enhanced Input System**  
+Integrates Unreal’s new input mapping for modular player actions.
+
+**Team-based AI Support**  
+Implements `IGenericTeamAgentInterface` for AI perception and team logic.
+
+**UI Integration**  
+Updates HUD dynamically via `Client_UpdateDamageUI` and `OnPickUpUI` events.
+![Gameplay Screenshot](Images/UI1.png)
+![Gameplay Screenshot](Images/UI2.png)
+
+**Server-authoritative Combat**  
+Damage and weapon switching handled through server RPCs to maintain integrity.
+
+**Blueprint Integration**  
+Exposes variables and events for designers (`BlueprintAssignable`, `BlueprintCallable`).
+
+---
 ---
 
 ## 4. Networking & replication patterns
