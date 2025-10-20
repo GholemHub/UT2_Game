@@ -250,7 +250,7 @@ Files: `Network/*`, look for `Server` prefixed functions, `NetMulticast` or `Cli
 
 ## 🎮 Steam Connection Setup
 
-Your project supports **Steam-based multiplayer** using the Unreal Online Subsystem (OSS). This allows seamless online sessions without manual IP configuration.
+Project supports **Steam-based multiplayer** using the Unreal Online Subsystem (OSS). This allows seamless online sessions without manual IP configuration.
 
 
 ![Gameplay Screenshot](Images/Steam.png)
@@ -286,11 +286,7 @@ Example Blueprint nodes:
 **4. Testing**  
 Use the test App ID `480` (Spacewar) for development. Run two instances of the game through Steam and confirm session visibility.
 
-**5. Deployment Note**  
-When publishing, replace the `AppId` with your official Steamworks App ID and verify the Steam overlay activates in-game.
-
 ---
-
 
 ## 5. How the project is organized (where to look)
 
