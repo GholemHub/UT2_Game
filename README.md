@@ -247,7 +247,50 @@ Key patterns used to make multiplayer feel responsive while remaining secure:
 
 Files: `Network/*`, look for `Server` prefixed functions, `NetMulticast` or `Client` tags.
 
+
+## 🎮 Steam Connection Setup
+
+Your project supports **Steam-based multiplayer** using the Unreal Online Subsystem (OSS). This allows seamless online sessions without manual IP configuration.
+
+
+![Gameplay Screenshot](Images/Steam.png)
+
+
+### Key Configuration Steps
+
+**1. Enable the Steam Subsystem**  
+In `DefaultEngine.ini`:
+```ini
+[OnlineSubsystem]
+DefaultPlatformService=Steam
+
+[OnlineSubsystemSteam]
+bEnabled=true
+SteamDevAppId=480   ; (use 480 for testing)
+bVACEnabled=0
+bAllowP2PPacketRelay=true
+P2PConnectionTimeout=90
+```
+
+**2. Add Steam SDK**  
+Install Steamworks SDK and configure the path in your Unreal Engine build settings. Ensure the DLLs (`steam_api.dll`, `steam_api64.dll`) are copied into the `Binaries/Win64` folder.
+
+**3. Session Management**  
+Your game can host, find, and join Steam lobbies using `OnlineSessionInterface`.
+Example Blueprint nodes:
+- `Create Session`
+- `Find Sessions`
+- `Join Session`
+- `Destroy Session`
+
+**4. Testing**  
+Use the test App ID `480` (Spacewar) for development. Run two instances of the game through Steam and confirm session visibility.
+
+**5. Deployment Note**  
+When publishing, replace the `AppId` with your official Steamworks App ID and verify the Steam overlay activates in-game.
+
 ---
+
 
 ## 5. How the project is organized (where to look)
 
