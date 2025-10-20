@@ -213,7 +213,6 @@ Damage and weapon switching handled through server RPCs to maintain integrity.
 Exposes variables and events for designers (`BlueprintAssignable`, `BlueprintCallable`).
 
 ---
----
 
 ## 4. Networking & replication patterns
 
@@ -252,8 +251,6 @@ Files: `Network/*`, look for `Server` prefixed functions, `NetMulticast` or `Cli
 
 ## 5. How the project is organized (where to look)
 
-(Adjust paths to match your repo structure)
-
 * `Source/YourGame/` - C++ gameplay code
 
   * `Characters/` - Player and AI character classes
@@ -290,40 +287,10 @@ Local host testing:
 
 ---
 
-## 7. Tuning & data-driven assets
-
-Place tunable values in `DataTables` (CSV/JSON import), e.g.:
-
-* Weapon damage, fire rates, recoil curves
-* AI aggression thresholds and perception ranges
-* Spawn timers and pickup respawn rates
-
-Recommended workflow: change values in DataTable → run quick PIE with two players → observe logs and tweak.
-
----
-
-## 8. Known limitations & optimization notes
+## 7. Known limitations & optimization notes
 
 * Client-side cosmetic effects can drift slightly from server state; ensure important gameplay is validated server-side.
 * Large numbers of AI will stress the server — consider LOD for AI (stop ticking non-critical AI far away).
 * Track replication bandwidth in profiler and reduce replicated state frequency where possible.
-
----
-
-## 9. Contributing / Contact / Credits
-
-If others will use this repo, include these:
-
-* **How to contribute**: Fork → feature branch → PR. Follow code style and include changelog entry.
-* **Contact**: Add your Discord / Email / Github handle.
-* **Credits**: Third-party assets, engine versions, plugins you used.
-
----
-
-## License
-
-Add your preferred license (MIT / GPL / proprietary). Example placeholder:
-
-`MIT — see LICENSE file`.
 
 ---
