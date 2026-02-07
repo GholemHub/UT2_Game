@@ -42,7 +42,8 @@ MSVC_PRAGMA(warning(pop))
 #endif	// USING_CODE_ANALYSIS
 
 #include <steam/isteamapps.h>
-#include <steam/isteamapplist.h>
+
+
 //#include <OnlineSubsystemSteamTypes.h>
 #pragma pop_macro("ARRAY_COUNT")
 

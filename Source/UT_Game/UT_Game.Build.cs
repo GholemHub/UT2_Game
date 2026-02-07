@@ -26,6 +26,7 @@ public class UT_Game : ModuleRules
             "OnlineSubsystem",
             "OnlineSubsystemUtils",
             "OnlineSubsystemSteam",
+            "Steamworks",
             "SteamSockets" // <-- critical: enables Steam P2P net driver
         });
 
